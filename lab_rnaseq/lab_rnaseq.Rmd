@@ -71,6 +71,16 @@ rv_col_light <- "#e7eef3"
 
 ---
 
+# Content
+
+- What is RNA sequencing
+- From reads to gene expression
+- Differential gene expression in R
+- 
+
+
+
+
 <p class="abstract">
 This is the workshop material for the RNA sequence and chip sequence part of the RAUKR course 2018. As part of the exercise we will download and analyse data from a few different public reposotories, but if you have own data that you want to analyze you can choose and pick the parts that fits with your experiment and data, but note that the majority of course participants will follow the exercies using the example data means that we will spend most energy on questions directly related the supplied example data. 
 
@@ -79,19 +89,52 @@ In many parts of the exercises
 
 ---
 
+# A short intro
+RNA-sequence data can be used for many different things (annotate genomes, identify SNPs etc), but the by far most common goal is to estimate expression patterns and identify genes that differs in expression between time/tissues/individuals.
+
 # Fetch some useful data
-There are many public reposotories that holds RNA-sequence data and for some of them one can access not only the raw read data, but also the .bam files or even the count matrix. This is useful as mapping the reads is a time consuming, but not very difficul step. Since we within the course do not have accesss to any compute resources besides our laptops, we will not focus our efforts on read mapping. All teachers involved have experiences in mapping rna-seq data to genomes so do not hesitate in asking questions relatede to this
+There are many public reposotories that holds RNA-sequence data and for some of them one can access not only the raw read data, but also processed data in different steps of the analysis (like .bam file and count matrices). This is useful as mapping the reads is a time consuming and computer intense step that is seldom necessary to redo even if one is re-analysing data with other questions in mind. Since we within the course do not have accesss to any compute resources besides our laptops, we will focus our efforts on RNA-seq analysis downstream of the read mapping.
 
 # Access public RNA-seq data
-RNA-seq data are deposited in most cases made public via open sequence repositories such as [https://www.ncbi.nlm.nih.gov/geo/](NCBIs Gene Expression Omnibus (GEO)) and [https://www.ebi.ac.uk/arrayexpress/](EBIs ArrayExpress). Both of these can be queried by just visiting the webpages, but they also have bioconductor packages so that one can query and download data directly from R. 
+RNA-seq data are deposited in most cases made public via open sequence repositories such as [https://www.ncbi.nlm.nih.gov/geo/](NCBIs Gene Expression Omnibus (GEO)) and [https://www.ebi.ac.uk/arrayexpress/](EBIs ArrayExpress). Both of these can be queried by just visiting the webpages, but they also have bioconductor packages so that one can query and download data directly from R. In addition to these there have been some major efforts in creating useful resources for the research community and make them publicly available. One such attempt is the [https://jhubiostatistics.shinyapps.io/recount/](recount2 project). This project have collected more than 2000 RNA-seq studies from humans and re-analysed them in an effecient and consistent manner and host both coverage data (bigwig files) and gene and exon expression data available at that web page. In the exercise below we will make use of data from the recount experiment, but you can of course try to download data from other resources.
 
 ## Download data set with ArrayExpress
 ```{r}
-library("ArrayExpress")
+library("ArrayExpress") 
 mtab6279 = getAE("E-MTAB-6279", type = "full")
 
 
 ```
+
+## Download data set with recount
+
+```{r}
+library(recount)
+# download_study("SRP049097", type = "rse-gene")
+#load(file.path("SRP049097", "rse_gene.Rdata"))
+download_study("SRP043368", type = "rse-gene")
+load(file.path("SRP043368", "rse_gene.Rdata"))
+
+
+rse_gene
+
+```
+
+## Sample information
+```{r}
+colData(rse_gene)
+
+```
+
+Information about the samples can be found in the in the last column of the S4Vectors DataFrame object that is named characteristics. From this list we can extract needed information using the sapply function.
+
+```{r}
+class(sapply(colData(rse_gene)$characteristics, "[", c(2,4)))
+
+colData(rse_gene)$characteristics[1,]
+
+```
+
 # Text Formatting  
 
 ## Level 2 heading  
